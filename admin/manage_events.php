@@ -20,6 +20,10 @@ include __DIR__ . '/../includes/header.php';
         <h2 class="mb-1">Manage Events</h2>
         <p class="text-secondary mb-4">View all published events and booking counts.</p>
 
+        <?php if (isset($_GET['updated'])): ?>
+            <div class="alert alert-success">Event updated successfully.</div>
+        <?php endif; ?>
+
         <div class="card panel-card">
             <div class="table-responsive">
                 <table class="table table-dark table-hover mb-0 align-middle">
@@ -48,9 +52,13 @@ include __DIR__ . '/../includes/header.php';
                             <td><?= (int) $event['total_bookings'] ?></td>
                             <td><?= (int) $event['capacity'] ?></td>
                             <td>
-                                <a href="/DreamEvents/admin/delete_event.php?event_id=<?= (int) $event['event_id'] ?>"
-                                   class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('Are you sure? This will remove the event and all related registrations.');">Delete</a>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <a href="/DreamEvents/admin/edit_event.php?event_id=<?= (int) $event['event_id'] ?>"
+                                       class="btn btn-sm btn-outline-info">Edit</a>
+                                    <a href="/DreamEvents/admin/delete_event.php?event_id=<?= (int) $event['event_id'] ?>"
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Are you sure? This will remove the event and all related registrations.');">Delete</a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
