@@ -1,0 +1,206 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --bg: #090f1f;
+    --panel: rgba(24, 31, 52, 0.72);
+    --panel-strong: #151b2f;
+    --text: #f8fbff;
+    --muted: #b8c1d9;
+    --primary: #7c3aed;
+    --primary2: #4f46e5;
+    --border: rgba(255, 255, 255, 0.12);
+}
+
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+body,
+body.app-bg {
+    background: radial-gradient(circle at top right, #1a2450 0%, var(--bg) 50%);
+    min-height: 100vh;
+    color: var(--text);
+}
+
+.page-enter {
+    animation: fadeInUp 0.45s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+p, span, label, small {
+    color: var(--muted);
+}
+
+h1, h2, h3, h4, h5 {
+    color: #fff;
+    font-weight: 700;
+}
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+}
+
+.auth-card,
+.glass-card,
+.card,
+.panel-card,
+.stat-card,
+.event-card {
+    background: var(--panel);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+    color: #fff;
+}
+
+.auth-card {
+    max-width: 480px;
+    width: 100%;
+}
+
+input,
+textarea,
+select,
+.form-control,
+.form-select {
+    background: #0f172a;
+    color: #fff;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus,
+.form-select:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 0.15rem rgba(139, 92, 246, 0.28);
+    transform: translateY(-1px);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #94a3b8;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 265px;
+    background: linear-gradient(180deg, #0b1226 0%, #0a1123 100%);
+    border-right: 1px solid rgba(148, 163, 184, 0.15);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    transition: all .25s ease;
+}
+
+.sidebar .brand {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: .3px;
+}
+
+.sidebar .nav-link {
+    color: #d6dcf6;
+    border-radius: 12px;
+    padding: .55rem .8rem;
+    transition: background .2s ease, transform .2s ease, color .2s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: linear-gradient(90deg, rgba(124,58,237,.25), rgba(79,70,229,.25));
+    color: #fff;
+    transform: translateX(4px);
+}
+
+.content-area {
+    flex: 1;
+    padding: 2rem;
+}
+
+.event-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.event-card {
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.45);
+    border-color: rgba(139,92,246,.45);
+}
+
+.btn-primary,
+.btn-gradient {
+    background: linear-gradient(135deg, var(--primary), var(--primary2));
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    transition: transform .2s ease, opacity .2s ease;
+}
+
+.btn-primary:hover,
+.btn-gradient:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+.alert {
+    border: 0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.empty-state {
+    padding: 1rem;
+    text-align: center;
+    color: #9fb0d8;
+    font-weight: 500;
+}
+
+table { color: #f8fbff; }
+th { color: #c4b5fd !important; }
+td { color: #e5e7eb; }
+.table-dark { --bs-table-bg: transparent; }
+
+.badge-pending { background: #f59e0b; color: #1f2937; }
+.badge-approved { background: #22c55e; color: #052e16; }
+.badge-rejected { background: #ef4444; color: #fff; }
+
+.app-footer {
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    color: #b9c1d9;
+    background: transparent;
+}
+
+@media (max-width: 992px) {
+    .sidebar { width: 220px; }
+    .content-area { padding: 1.2rem; }
+}
+
+@media (max-width: 768px) {
+    .app-layout { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: static; }
+}
