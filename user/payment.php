@@ -26,6 +26,7 @@ if ((float) $event['price'] <= 0) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
     $cardNumber = preg_replace('/\D+/', '', $_POST['card_number'] ?? '');
     $expiry = trim($_POST['expiry'] ?? '');
     $cvv = preg_replace('/\D+/', '', $_POST['cvv'] ?? '');
@@ -66,6 +67,7 @@ include __DIR__ . '/../includes/header.php';
                     <?php endif; ?>
 
                     <form method="post" class="row g-3 js-processing-form">
+                        <?= csrfField() ?>
                         <div class="col-12">
                             <label class="form-label">Card Number</label>
                             <input type="text" class="form-control" name="card_number" maxlength="19" placeholder="1234 5678 9012 3456" required>

@@ -4,7 +4,14 @@ require_once __DIR__ . '/../includes/auth.php';
 
 requireRole('user');
 
-$registrationId = (int) ($_GET['registration_id'] ?? 0);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: /DreamEvents/user/my_bookings.php?refund_error=1');
+    exit;
+}
+
+verifyCsrfOrAbort();
+
+$registrationId = (int) ($_POST['registration_id'] ?? 0);
 if ($registrationId <= 0) {
     header('Location: /DreamEvents/user/my_bookings.php?refund_error=1');
     exit;

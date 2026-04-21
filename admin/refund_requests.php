@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
 requireRole('admin');
 
@@ -8,13 +9,15 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
+
     $refundId = (int) ($_POST['refund_id'] ?? 0);
     $action = $_POST['action'] ?? '';
 
     if ($refundId <= 0 || !in_array($action, ['approve', 'reject'], true)) {
         $error = 'Invalid refund action.';
     } else {
-        $stmt = $pdo->prepare('SELECT * FROM refund_requests WHERE refund_id = ? LIMIT 1');
+        $stmt = $pdo->prepare('SELECT rr.*, u.username, u.email FROM refund_requests rr INNER JOIN users u ON u.user_id = rr.user_id WHERE refund_id = ? LIMIT 1');
         $stmt->execute([$refundId]);
         $refund = $stmt->fetch();
 
@@ -40,6 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdo->commit();
+
+                if (!empty($refund['email'])) {
+                    $title = $newStatus === 'approved' ? 'Refund Approved' : 'Refund Rejected';
+                    $text = $newStatus === 'approved'
+                        ? '<p>Your refund request has been approved.</p><p>Refund amount: ₹' . number_format((float) $refund['refund_amount'], 2) . '</p>'
+                        : '<p>Your refund request has been rejected.</p><p>Please contact support for more details.</p>';
+                    sendSystemEmail($refund['email'], $refund['username'], 'DreamEvents Refund Request ' . ucfirst($newStatus), dreamEventsBrandTemplate($title, $text));
+                }
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) {
                     $pdo->rollBack();
@@ -106,6 +117,7 @@ include __DIR__ . '/../includes/header.php';
                             <td>
                                 <?php if ($req['status'] === 'requested'): ?>
                                     <form method="post" class="d-flex gap-2">
+                                        <?= csrfField() ?>
                                         <input type="hidden" name="refund_id" value="<?= (int) $req['refund_id'] ?>">
                                         <button class="btn btn-sm btn-success" name="action" value="approve" type="submit">Approve</button>
                                         <button class="btn btn-sm btn-danger" name="action" value="reject" type="submit">Reject</button>

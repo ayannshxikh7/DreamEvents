@@ -204,3 +204,25 @@ td { color: #e5e7eb; }
     .app-layout { flex-direction: column; }
     .sidebar { width: 100%; height: auto; position: static; }
 }
+
+.card,
+.panel-card,
+.event-card,
+.auth-card {
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+.panel-card:hover,
+.auth-card:hover {
+    box-shadow: 0 16px 38px rgba(10, 14, 28, 0.55);
+}
+
+.form-control:hover,
+.form-select:hover {
+    border-color: rgba(124, 58, 237, 0.65);
+}
+
+.btn[disabled] {
+    opacity: 0.75;
+    cursor: not-allowed;
+}

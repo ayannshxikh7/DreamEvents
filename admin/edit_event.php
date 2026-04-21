@@ -22,6 +22,7 @@ if (!$event) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
     $name = trim($_POST['event_name'] ?? '');
     $eventDate = $_POST['event_date'] ?? '';
     $eventTime = $_POST['event_time'] ?? '';
@@ -104,6 +105,7 @@ include __DIR__ . '/../includes/header.php';
             <?php endif; ?>
 
             <form method="post" enctype="multipart/form-data" class="row g-3">
+                <?= csrfField() ?>
                 <input type="hidden" name="event_id" value="<?= (int) $eventId ?>">
 
                 <div class="col-md-6">

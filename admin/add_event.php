@@ -8,6 +8,7 @@ $error = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
     $name = trim($_POST['event_name'] ?? '');
     $eventDate = $_POST['event_date'] ?? '';
     $eventTime = $_POST['event_time'] ?? '';
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $imageName = null;
         if (!empty($_FILES['image']['name'])) {
-            $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+            $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png'];
             $uploadError = $_FILES['image']['error'] ?? UPLOAD_ERR_OK;
             $tmpPath = $_FILES['image']['tmp_name'] ?? '';
             $mime = ($uploadError === UPLOAD_ERR_OK && is_uploaded_file($tmpPath)) ? mime_content_type($tmpPath) : '';
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($uploadError !== UPLOAD_ERR_OK) {
                 $error = 'Image upload failed. Please try again.';
             } elseif (!isset($allowed[$mime])) {
-                $error = 'Only JPG, PNG, or WEBP images are allowed.';
+                $error = 'Only JPG or PNG images are allowed.';
             } elseif ($_FILES['image']['size'] > 2 * 1024 * 1024) {
                 $error = 'Image size must be less than 2MB.';
             } else {
@@ -67,6 +68,7 @@ include __DIR__ . '/../includes/header.php';
             <?php endif; ?>
 
             <form method="post" enctype="multipart/form-data" class="row g-3">
+                <?= csrfField() ?>
                 <div class="col-md-6">
                     <label class="form-label">Event Name</label>
                     <input type="text" class="form-control" name="event_name" required>
@@ -93,8 +95,8 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="col-12">
                     <label class="form-label">Event Image (Optional)</label>
-                    <input type="file" class="form-control" name="image" accept="image/png,image/jpeg,image/webp">
-                    <small class="text-secondary">Max 2MB. Supported: JPG, PNG, WEBP.</small>
+                    <input type="file" class="form-control" name="image" accept="image/png,image/jpeg">
+                    <small class="text-secondary">Max 2MB. Supported: JPG, PNG.</small>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Description</label>

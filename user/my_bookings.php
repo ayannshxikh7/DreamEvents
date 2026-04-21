@@ -70,11 +70,18 @@ include __DIR__ . '/../includes/header.php';
                                 <?php endif; ?>
                             </td>
                             <td>
+                                <div class="d-flex flex-wrap gap-2">
+                                <a href="/DreamEvents/user/download_ticket.php?registration_id=<?= (int) $booking['registration_id'] ?>" class="btn btn-sm btn-outline-info">Download Ticket</a>
                                 <?php if ($eligibleRefund): ?>
-                                    <a href="/DreamEvents/user/request_refund.php?registration_id=<?= (int) $booking['registration_id'] ?>" class="btn btn-sm btn-primary" onclick="return confirm('Request refund? 10% commission will be deducted.');">Request Refund</a>
+                                    <form method="post" action="/DreamEvents/user/request_refund.php" onsubmit="return confirm('Request refund? 10% commission will be deducted.');">
+                                        <?= csrfField() ?>
+                                        <input type="hidden" name="registration_id" value="<?= (int) $booking['registration_id'] ?>">
+                                        <button class="btn btn-sm btn-primary" type="submit">Request Refund</button>
+                                    </form>
                                 <?php else: ?>
                                     <span class="text-secondary small">Not eligible</span>
                                 <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

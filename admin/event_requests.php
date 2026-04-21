@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/mailer.php';
 
 requireRole('admin');
 
@@ -8,13 +9,15 @@ $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
+
     $requestId = (int) ($_POST['request_id'] ?? 0);
     $action = $_POST['action'] ?? '';
 
     if ($requestId <= 0 || !in_array($action, ['approve', 'reject'], true)) {
         $error = 'Invalid request action.';
     } else {
-        $requestStmt = $pdo->prepare('SELECT * FROM event_requests WHERE request_id = ? LIMIT 1');
+        $requestStmt = $pdo->prepare('SELECT er.*, u.username, u.email FROM event_requests er INNER JOIN users u ON u.user_id = er.user_id WHERE request_id = ? LIMIT 1');
         $requestStmt->execute([$requestId]);
         $request = $requestStmt->fetch();
 
@@ -26,6 +29,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rejectStmt = $pdo->prepare("UPDATE event_requests SET status = 'rejected' WHERE request_id = ?");
             $rejectStmt->execute([$requestId]);
             $message = 'Event request rejected.';
+
+            if (!empty($request['email'])) {
+                $html = dreamEventsBrandTemplate('Event Request Update', '<p>Your event request has been <strong>rejected</strong>.</p><p>You can submit another request anytime.</p>');
+                sendSystemEmail($request['email'], $request['username'], 'Your event request has been rejected', $html);
+            }
         } else {
             try {
                 $pdo->beginTransaction();
@@ -48,6 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $pdo->commit();
                 $message = 'Event request approved and published.';
+
+                if (!empty($request['email'])) {
+                    $html = dreamEventsBrandTemplate('Event Request Update', '<p>Your event request has been <strong>approved</strong> and is now live on DreamEvents.</p>');
+                    sendSystemEmail($request['email'], $request['username'], 'Your event request has been approved', $html);
+                }
             } catch (Throwable $e) {
                 if ($pdo->inTransaction()) {
                     $pdo->rollBack();
@@ -114,6 +127,7 @@ include __DIR__ . '/../includes/header.php';
                             <td>
                                 <?php if ($request['status'] === 'pending'): ?>
                                     <form method="post" class="d-flex gap-2">
+                                        <?= csrfField() ?>
                                         <input type="hidden" name="request_id" value="<?= (int) $request['request_id'] ?>">
                                         <button class="btn btn-sm btn-success" name="action" value="approve" type="submit">Approve</button>
                                         <button class="btn btn-sm btn-danger" name="action" value="reject" type="submit">Reject</button>
