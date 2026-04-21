@@ -37,6 +37,7 @@ if ($alreadyBooked->fetch()) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
     $fullName = trim($_POST['full_name'] ?? '');
     $gender = $_POST['gender'] ?? '';
     $age = (int) ($_POST['age'] ?? 0);
@@ -91,6 +92,7 @@ include __DIR__ . '/../includes/header.php';
                         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
                     <form method="post" class="row g-3 js-processing-form">
+                        <?= csrfField() ?>
                         <input type="hidden" name="event_id" value="<?= (int) $event['event_id'] ?>">
                         <div class="col-12">
                             <label class="form-label">Full Name</label>

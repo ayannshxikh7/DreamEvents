@@ -9,29 +9,40 @@ if (isLoggedIn()) {
 
 $error = '';
 $success = '';
+$username = '';
+$email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrfOrAbort();
+
     $username = trim($_POST['username'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    if ($username === '' || $password === '' || $confirmPassword === '') {
+    if ($username === '' || $email === '' || $password === '' || $confirmPassword === '') {
         $error = 'All fields are required.';
+    } elseif (!preg_match('/^[a-zA-Z0-9_]{3,50}$/', $username)) {
+        $error = 'Username must be 3-50 chars (letters, numbers, underscore).';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
     } elseif ($password !== $confirmPassword) {
         $error = 'Passwords do not match.';
-    } elseif (strlen($password) < 6) {
-        $error = 'Password must be at least 6 characters.';
+    } elseif (strlen($password) < 8) {
+        $error = 'Password must be at least 8 characters.';
     } else {
-        $stmt = $pdo->prepare('SELECT user_id FROM users WHERE username = ? LIMIT 1');
-        $stmt->execute([$username]);
+        $stmt = $pdo->prepare('SELECT user_id FROM users WHERE username = ? OR email = ? LIMIT 1');
+        $stmt->execute([$username, $email]);
 
         if ($stmt->fetch()) {
-            $error = 'Username already exists.';
+            $error = 'Username or email already exists.';
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            $insert = $pdo->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'user')");
-            $insert->execute([$username, $hashedPassword]);
+            $insert = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')");
+            $insert->execute([$username, $email, $hashedPassword]);
             $success = 'Account created successfully. Please login.';
+            $username = '';
+            $email = '';
         }
     }
 }
@@ -51,9 +62,14 @@ include __DIR__ . '/../includes/header.php';
                 <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
             <?php endif; ?>
             <form method="post">
+                <?= csrfField() ?>
                 <div class="mb-3">
                     <label class="form-label">Username</label>
-                    <input type="text" class="form-control" name="username" required>
+                    <input type="text" class="form-control" name="username" value="<?= htmlspecialchars($username) ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($email) ?>" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>

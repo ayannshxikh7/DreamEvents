@@ -4,6 +4,7 @@ USE dreamevents;
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(120) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS registrations (
     full_name VARCHAR(120) NOT NULL,
     gender ENUM('Male', 'Female', 'Other') NOT NULL,
     age TINYINT UNSIGNED NOT NULL,
+    booking_reference VARCHAR(32) DEFAULT NULL,
     payment_status ENUM('free', 'paid') NOT NULL,
     amount_paid DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     refund_status ENUM('none','requested','approved','rejected') NOT NULL DEFAULT 'none',
@@ -61,6 +63,27 @@ CREATE TABLE IF NOT EXISTS event_requests (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+
+CREATE TABLE IF NOT EXISTS login_attempts (
+    attempt_id INT AUTO_INCREMENT PRIMARY KEY,
+    identity_key VARCHAR(150) NOT NULL UNIQUE,
+    fail_count INT NOT NULL DEFAULT 0,
+    locked_until DATETIME NULL,
+    last_attempt DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_otps (
+    otp_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    otp_hash VARCHAR(255) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    is_used TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_otp_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS refund_requests (
     refund_id INT AUTO_INCREMENT PRIMARY KEY,
     registration_id INT NOT NULL UNIQUE,
@@ -80,8 +103,8 @@ CREATE TABLE IF NOT EXISTS refund_requests (
         ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-INSERT INTO users (username, password, role)
-VALUES ('admin', '$2y$12$wxACj1jVMslxqw3G4IHZHOv4LYrPutpsdllmbwefT5MejXnCnTfc6', 'admin')
+INSERT INTO users (username, email, password, role)
+VALUES ('admin', 'admin@dreamevents.local', '$2y$12$wxACj1jVMslxqw3G4IHZHOv4LYrPutpsdllmbwefT5MejXnCnTfc6', 'admin')
 ON DUPLICATE KEY UPDATE username = VALUES(username);
 
 INSERT INTO events (event_name, event_date, event_time, venue, description, price, image)
