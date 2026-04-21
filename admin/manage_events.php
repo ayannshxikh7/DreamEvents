@@ -13,7 +13,7 @@ $events = $eventsStmt->fetchAll();
 
 $pageTitle = 'Manage Events';
 include __DIR__ . '/../includes/header.php';
-?>
+?>https://github.com/ayannshxikh7/DreamEvents/pull/2/conflict?name=admin%252Fedit_event.php&base_oid=581bd6888301db0178d2b9f7bf1c2882a17355bf&head_oid=85af9ea248b16a4ab83b434f0f8520832928c260
 <div class="app-layout">
     <?php include __DIR__ . '/../includes/sidebar.php'; ?>
     <main class="content-area page-enter">

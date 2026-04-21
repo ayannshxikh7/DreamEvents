@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $imageName = $event['image'];
 
         if (!empty($_FILES['image']['name'])) {
-            $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png'];
+            $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
             $uploadError = $_FILES['image']['error'] ?? UPLOAD_ERR_OK;
             $tmpPath = $_FILES['image']['tmp_name'] ?? '';
             $mime = ($uploadError === UPLOAD_ERR_OK && is_uploaded_file($tmpPath)) ? mime_content_type($tmpPath) : '';
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($uploadError !== UPLOAD_ERR_OK) {
                 $error = 'Image upload failed. Please try again.';
             } elseif (!isset($allowed[$mime])) {
-                $error = 'Only JPG or PNG images are allowed.';
+                $error = 'Only JPG, PNG, or WEBP images are allowed.';
             } elseif (($_FILES['image']['size'] ?? 0) > 2 * 1024 * 1024) {
                 $error = 'Image size must be less than 2MB.';
             } else {
@@ -134,8 +134,8 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="col-12">
                     <label class="form-label">Event Image (Optional Replacement)</label>
-                    <input type="file" class="form-control" name="image" accept="image/png,image/jpeg">
-                    <small class="text-secondary">Leave empty to keep current image. Max 2MB. Supported: JPG, PNG.</small>
+                    <input type="file" class="form-control" name="image" accept="image/png,image/jpeg,image/webp">
+                    <small class="text-secondary">Leave empty to keep current image. Max 2MB. Supported: JPG, PNG, WEBP.</small>
                 </div>
                 <div class="col-12">
                     <div class="d-flex align-items-center gap-3 p-2 rounded" style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(148, 163, 184, 0.2);">
